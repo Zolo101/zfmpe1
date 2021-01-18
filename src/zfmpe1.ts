@@ -1,8 +1,9 @@
 import * as discordjs from "discord.js";
+import fs from "fs";
 import { MessageAttachment } from "discord.js";
 import Command, { prefix } from "./command";
 import { renderVideo, bufferFile2, downloadFile } from "./download";
-import Xfmpe1Container, { parseXfmpe1Command, Xfmpe1Command, Xfmpe1Preset } from "./xfmpe1command";
+import Xfmpe1Container, { parseXfmpe1String, Xfmpe1Command, Xfmpe1Preset } from "./xfmpe1command";
 const Discord = discordjs;
 const client = new Discord.Client();
 const botcommands: Command[] = []
@@ -13,56 +14,168 @@ const commands: Map<string, Xfmpe1Command> = new Map();
 list.set("any", new Xfmpe1Container("any"));
 list.set("vf", new Xfmpe1Container("vf"));
 list.set("filter:v", new Xfmpe1Container("filter:v"));
-commands.set("scale", new Xfmpe1Command("vf", (width: number, height: number) => {
-    return `-vf scale=${width}:${height}`;
-}))
-commands.set("scale!", new Xfmpe1Command("vf", (width: number) => {
-    return `-vf scale=${width}:-1`;
-}))
+commands.set("scale", new Xfmpe1Command("vf", (width: number, height: number, algorithm = "fast_bilinear") => {
+    return `-vf scale=${width}:${height}:flags=${algorithm}`;
+}, `
+(width, height, (optional) algorithm)
+Explictly sets the width and height of a video.
+If you want to keep the aspect ratio, use "scale!".
+
+List of Scaling algorithms: https://ffmpeg.org/ffmpeg-scaler.html#Scaler-Options
+`))
+
+commands.set("scale!", new Xfmpe1Command("vf", (width: number, algorithm = "fast_bilinear") => {
+    return `-vf scale=${width}:-2:flags=${algorithm}`;
+}, `
+(width, (optional) algorithm)
+Shorthand for \`scale\`, tries to keep the aspect ratio.
+
+List of Scaling algorithms: https://ffmpeg.org/ffmpeg-scaler.html#Scaler-Options
+`))
+
+commands.set("crf", new Xfmpe1Command("any", (value: number) => {
+    return `-crf ${value}`;
+}, `
+(value)
+
+CRF controls the quality of the video. 0 is completely lossless, while 51 is the worst.
+I'd recommend 30 for a good balance of filesize and quality, and 40 if you dont mind saving a few more kilobytes.
+
+See more: https://trac.ffmpeg.org/wiki/Encode/H.264
+`))
+
+commands.set("preset", new Xfmpe1Command("any", (preset: string) => {
+    return `-preset ${preset}`;
+}, `
+(preset)
+
+The encoding speed. Balances encoding speed and quality.
+
+See preset list: https://trac.ffmpeg.org/wiki/Encode/H.264
+`))
+
+commands.set("tune", new Xfmpe1Command("any", (tune: string) => {
+    return `-tune ${tune}`;
+}, `
+(tune)
+
+Tunes the encoding to your specfic need.
+
+See tune list: https://trac.ffmpeg.org/wiki/Encode/H.264
+`))
+
 commands.set("bv", new Xfmpe1Command("any", (bitrate: number) => {
     return `-b:v ${bitrate}K`;
-}))
+}, `
+(bitrate)
+
+Video bitrate in kilobytes.
+`))
+
 commands.set("ba", new Xfmpe1Command("any", (bitrate: number) => {
     return `-b:a ${bitrate}K`;
-}))
+}, `
+(bitrate)
+
+Audio bitrate in kilobytes.
+`))
+
 commands.set("crop", new Xfmpe1Command("filter:v", (width: number, height: number, x: number, y: number) => {
     return `-filter:v "crop=${width}:${height}:${x}:${y}"`;
-}))
-commands.set("trim", new Xfmpe1Command("any", (hour: number, minutes: number, seconds: number) => {
+}, `
+(width, height, x, y)
+
+Crops video. 
+`))
+
+commands.set("cut:after", new Xfmpe1Command("any", (hour: number, minutes: number, seconds: number) => {
     return `-ss ${hour}:${minutes}:${seconds}`;
-}))
-commands.set("trim!", new Xfmpe1Command("any", (seconds: number) => {
+}, `
+(hour, minutes, seconds)
+
+Cuts everything AFTER the timeframe specified.
+`))
+
+commands.set("cut:before", new Xfmpe1Command("any", (seconds: number) => {
     return `-t ${seconds}`;
-}))
+}, `
+(seconds)
+
+Cuts everything BEFORE the timeframe specified.
+`))
+
 commands.set("copy", new Xfmpe1Command("any", () => {
     return "-codec copy";
-}))
+}, `
+no args
+
+Skips encoding. 
+It's not recommended to use this unless you know what your doing.
+`))
+
 commands.set("manual", new Xfmpe1Command("any", (manual: string) => {
     return manual;
-}))
+}, `
+(manual)
+(ZELO ONLY)
+
+Manual lets you set ffmpeg commands that zfmpe1 currently doesn't have.
+`))
+
 commands.set("s", new Xfmpe1Command("filter:v", (speed: number) => {
     return `-filter:v "setpts=PTS/${speed}"`;
-}))
+}, `
+(speed)
+(EXPERIMENTAL)
+
+Changes the video speed. (NOT THE AUDIO!)
+0.5 slows the video 200%, and 2 makes the video 2 times faster.
+`))
+
 commands.set("invert", new Xfmpe1Command("vf", () => {
     return "-vf negate";
-}))
+}, `
+no args
+
+Inverts video colors.
+`))
+
 commands.set("mute", new Xfmpe1Command("any", () => {
     return "-an";
-}))
+}, `
+no args
 
-presets.set("144p", new Xfmpe1Preset("scale!(144)"))
-presets.set("480p", new Xfmpe1Preset("scale!(480)"))
-presets.set("720p", new Xfmpe1Preset("scale!(720)"))
-presets.set("yeet", new Xfmpe1Preset("bv(40)"))
-presets.set("lite", new Xfmpe1Preset("bv(75)"))
-presets.set("optimize", new Xfmpe1Preset("scale!(480); bv(80) manual(-preset slow)"))
+Mutes video.
+`))
 
-/*
-xfmpe1list.push(
-    new Xfmpe1Container("-vf").commands.push(
-        new Xfmpe1Command("scale", )
-    )
-) */
+presets.set("144p", new Xfmpe1Preset("scale!(144)", `
+Scale video width to 144, keeping the aspect ratio.
+`))
+
+presets.set("480p", new Xfmpe1Preset("scale!(480)", `
+Scale video width to 480, keeping the aspect ratio.
+`))
+
+presets.set("720p", new Xfmpe1Preset("scale!(720)", `
+Scale video width to 720, keeping the aspect ratio.
+`))
+
+presets.set("yeet", new Xfmpe1Preset("bv(50)", `
+YEETs the quality.
+`))
+
+presets.set("lite", new Xfmpe1Preset("crf(40)", `
+Lowers the video's quality. Lite(tm)
+`))
+
+presets.set("optimize", new Xfmpe1Preset("480p lite preset(veryslow)", `
+Optimizes the video for discord.
+`))
+
+presets.set("covertest", new Xfmpe1Preset("optimize manual(\"-map 0:0 -map 1:0\") copy", `
+Music cover video test
+`))
+
 
 const getCommandList = () => {
     let str = "";
@@ -93,12 +206,21 @@ if you want zfmpe1 on your server, contact Zelo101 with the member count and a d
 
 made by zelo101, version 1.0\`\`\`
     `)),
-    new Command("tutor", (msg) => msg.reply(`\`\`\`
+    new Command("tutor", (msg) => {
+        const args = msg.content.slice(prefix.length + 6).trim();
+        if (args) {
+            if (commands.has(args)) msg.channel.send(`\`\`\`${commands.get(args)?.description}\`\`\``)
+            if (presets.has(args)) msg.channel.send(`\`\`\`${presets.get(args)?.description}\`\`\``)
+        } else {
+            msg.reply(`\`\`\`
+do "tutor help command" for more infomation on a command.
+
 every command avaliable:
 ${getCommandList()}
 every preset avaliable:
 ${getPresetList()}\`\`\`
-    `)),
+        `)}
+    }),
     new Command("run", (msg) => {
         const args = msg.content.slice(prefix.length + 4).trim();
         // the 4 is for the run command (lazy way)
@@ -112,7 +234,7 @@ ${getPresetList()}\`\`\`
                 return;
             }
 
-            const parsedcmds = parseXfmpe1Command(args, msg, commands, presets).trim()
+            const parsedcmds = parseXfmpe1String(args, msg, commands, presets).trim()
 
             if (!parsedcmds.length) {
                 msg.reply("you need arguments! #debate")
@@ -145,7 +267,7 @@ client.on("ready", () => {
     console.log(`Logged in as ${client.user?.tag}`)
     client.user?.setPresence({
         activity: {
-            name: "with ffmpeg"
+            name: "with ffmpeg | z tutor"
         }
     })
 });
@@ -157,4 +279,4 @@ client.on("message", (msg) => {
     })
 });
 
-client.login("TOKEN HERE")
+client.login(fs.readFileSync("../token.txt").toString())

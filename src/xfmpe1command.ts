@@ -15,10 +15,18 @@ export class Xfmpe1Command {
     container: string
     make: (...params: inputTypes[]) => string
     attachments: number
+    description: string
 
-    constructor(container: string, make: (...params: any) => string, attachments = 1) {
+    constructor(
+        container: string,
+        make: (...params: any) => string,
+        description: string,
+        attachments = 1
+    ) {
         this.container = container;
         this.make = make;
+
+        this.description = description;
         this.attachments = attachments;
     }
 
@@ -29,55 +37,78 @@ export class Xfmpe1Command {
 
 export class Xfmpe1Preset {
     command: string
+    description: string
 
-    constructor(command: string) {
+    constructor(command: string, description: string) {
         this.command = command;
+        this.description = description;
     }
 }
 
-export function parseXfmpe1Command(
+export function parseXfmpe1String(
     cmds: string,
     msg: Message,
     cmdlib: Map<string, Xfmpe1Command>,
     prelib: Map<string, Xfmpe1Preset>,
 ): string {
     // console.log(cmds, lib)
-    let c1 = cmds.trim().split(";");
+    const splitregex = /\S+\((.*?)\)|\S+/g
+    let c1 = cmds.trim().match(splitregex) as RegExpMatchArray
     let str = "";
     const preset = prelib.get(cmds.trim());
     if (preset !== undefined) {
         // str = prelib.get(cmds.trim())?.command;
-        c1 = preset.command.split(";");
+        c1 = preset.command.match(splitregex) as RegExpMatchArray
     }
     console.log(c1);
     c1.forEach((cc) => { // Parse each command
-        const command = cc.match(/[\w.!]+/g)
-        console.log(command)
-        if (command !== null) { // Does command exist?
-            const params = command
-                .slice(1) // get rid of the command
-                .map((param) => param.toLowerCase()); // make sure the params is lowercase
-
-            const func = cmdlib.get(command[0]);
-            if (func === undefined) { // Does function exist?
-                msg.reply(`Unknown command: \`${command[1]}\``)
-                return;
-            }
-            if (params.length > 0) { // Does function take params?
-                str += func.make(...params) + " ";
-                console.log("Func:", func.make(...params))
-            } else {
-                str += func.make() + " ";
-            }
-        } else {
-            msg.reply(`Invalid Command: \`${cc}\``)
-            return;
-        }
+        if (cc !== null) str += parseXfmpe1Command(cc, msg, cmdlib, prelib);
     })
 
     console.log("Final string:", str)
-
     return str;
+}
+
+function parseXfmpe1Command(
+    cc: string,
+    msg: Message,
+    cmdlib: Map<string, Xfmpe1Command>,
+    prelib: Map<string, Xfmpe1Preset>,
+): string {
+    const command = cc.match(/[\w.!-]+|"(.*)"/g)
+    // Does command exist?
+    if (command === null) return "";
+
+    const func = (cmdlib.has(command[0])) ? cmdlib.get(command[0]) : false
+    const pre = (prelib.has(command[0])) ? prelib.get(command[0]) : false
+
+    // Preset check
+    if (pre) {
+        return parseXfmpe1Command(pre.command, msg, cmdlib, prelib)
+    }
+
+    // Manual check
+    if (command[0] === "manual" && msg.author.id === "262343010916892673") {
+        return command[1].substring(1, command[1].length - 1)
+    }
+
+    const params = command
+        .slice(1) // get rid of the command
+        .map((param) => param.toLowerCase()); // make sure the params is lowercase
+
+    // Does function exist?
+    if (!func) {
+        msg.reply(`Unknown command: \`${command[0]}\``)
+        return "";
+    }
+
+    // Does function take params?
+    if (params.length > 0) {
+        console.log("Func:", func.make(...params))
+        return func.make(...params) + " ";
+    } else {
+        return func.make() + " ";
+    }
 }
 
 export default Xfmpe1Container;
