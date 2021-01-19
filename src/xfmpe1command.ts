@@ -84,7 +84,7 @@ function parseXfmpe1Command(
 
     // Preset check
     if (pre) {
-        return parseXfmpe1Command(pre.command, msg, cmdlib, prelib)
+        return parseXfmpe1String(pre.command, msg, cmdlib, prelib)
     }
 
     // Manual check

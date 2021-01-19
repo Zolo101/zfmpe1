@@ -11,6 +11,8 @@ const list: Map<string, Xfmpe1Container> = new Map();
 const presets: Map<string, Xfmpe1Preset> = new Map();
 const commands: Map<string, Xfmpe1Command> = new Map();
 
+const multitasking = 4;
+
 list.set("any", new Xfmpe1Container("any"));
 list.set("vf", new Xfmpe1Container("vf"));
 list.set("filter:v", new Xfmpe1Container("filter:v"));
@@ -24,11 +26,11 @@ If you want to keep the aspect ratio, use "scale!".
 List of Scaling algorithms: https://ffmpeg.org/ffmpeg-scaler.html#Scaler-Options
 `))
 
-commands.set("scale!", new Xfmpe1Command("vf", (width: number, algorithm = "fast_bilinear") => {
-    return `-vf scale=${width}:-2:flags=${algorithm}`;
+commands.set("scale!", new Xfmpe1Command("vf", (width: number) => {
+    return `-vf scale=${width}:-2:flags=fast_bilinear`;
 }, `
-(width, (optional) algorithm)
-Shorthand for \`scale\`, tries to keep the aspect ratio.
+(width)
+Shorthand for "scale", tries to keep the aspect ratio.
 
 List of Scaling algorithms: https://ffmpeg.org/ffmpeg-scaler.html#Scaler-Options
 `))
@@ -152,6 +154,10 @@ presets.set("144p", new Xfmpe1Preset("scale!(144)", `
 Scale video width to 144, keeping the aspect ratio.
 `))
 
+presets.set("360p", new Xfmpe1Preset("scale!(360)", `
+Scale video width to 360, keeping the aspect ratio.
+`))
+
 presets.set("480p", new Xfmpe1Preset("scale!(480)", `
 Scale video width to 480, keeping the aspect ratio.
 `))
@@ -160,16 +166,28 @@ presets.set("720p", new Xfmpe1Preset("scale!(720)", `
 Scale video width to 720, keeping the aspect ratio.
 `))
 
-presets.set("yeet", new Xfmpe1Preset("bv(50)", `
+presets.set("yeet", new Xfmpe1Preset("crf(50)", `
 YEETs the quality.
 `))
 
-presets.set("lite", new Xfmpe1Preset("crf(40)", `
+presets.set("lite", new Xfmpe1Preset("crf(35)", `
 Lowers the video's quality. Lite(tm)
 `))
 
-presets.set("optimize", new Xfmpe1Preset("480p lite preset(veryslow)", `
+presets.set("optimize", new Xfmpe1Preset("480p lite preset(veryfast)", `
 Optimizes the video for discord.
+`))
+
+presets.set("s_optimize", new Xfmpe1Preset("360p lite preset(slow)", `
+REALLY optimizes the video for discord.
+`))
+
+presets.set("a_optimize", new Xfmpe1Preset("optimize tune(animation)", `
+Optimizes animation for discord.
+`))
+
+presets.set("sa_optimize", new Xfmpe1Preset("s_optimize tune(animation)", `
+REALLY optimizes animation for discord.
 `))
 
 presets.set("covertest", new Xfmpe1Preset("optimize manual(\"-map 0:0 -map 1:0\") copy", `
@@ -245,11 +263,13 @@ ${getPresetList()}\`\`\`
             if (parsedcmds.length) msg.channel.send(`Using commands: \`${parsedcmds}\``)
 
             // start the process!
+            const startTime = Date.now();
             msg.channel.startTyping();
 
             downloadFile(attachment.url).then(() => {
                 renderVideo(parsedcmds).then(() => {
-                    msg.channel.send(`${msg.author}, here is your video, served fresh from the buffer:`, new MessageAttachment(bufferFile2, "video.mp4"))
+                    const endTime = new Date(Date.now() - startTime).getTime();
+                    msg.channel.send(`${msg.author}, here is your video, served fresh from the buffer (${endTime}ms):`, new MessageAttachment(bufferFile2, "video.mp4"))
                 }).catch((error) => {
                     msg.channel.send("sorry, there has been an error at our side")
                     console.error("FFMPEG ERROR:", error)
@@ -279,4 +299,4 @@ client.on("message", (msg) => {
     })
 });
 
-client.login(fs.readFileSync("../token.txt").toString())
+client.login(fs.readFileSync("token.txt").toString())
