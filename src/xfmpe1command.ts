@@ -94,7 +94,14 @@ function parseXfmpe1Command(
 
     const params = command
         .slice(1) // get rid of the command
-        .map((param) => param.toLowerCase()); // make sure the params is lowercase
+        .map((param) => param.toLowerCase().match(/[a-z0-9]+/g)?.toString()) // make sure the params is lowercase
+
+    params.forEach((param) => {
+        if (param === undefined) {
+            msg.reply(`Illegal params: Characters allowed: a-z, 0-9. \`${command}\``)
+            return "";
+        }
+    })
 
     // Does function exist?
     if (!func) {
@@ -104,8 +111,8 @@ function parseXfmpe1Command(
 
     // Does function take params?
     if (params.length > 0) {
-        console.log("Func:", func.make(...params))
-        return func.make(...params) + " ";
+        console.log("Func:", func.make(...params as string[]))
+        return func.make(...params as string[]) + " ";
     } else {
         return func.make() + " ";
     }
