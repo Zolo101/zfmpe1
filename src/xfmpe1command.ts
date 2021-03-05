@@ -88,7 +88,7 @@ function parseXfmpe1Command(
     }
 
     // Manual check
-    if (command[0] === "manual" && msg.author.id === "262343010916892673") {
+    if ((command[0] === "manual" || command[0] === "truemanual") && msg.author.id === "262343010916892673") {
         return command[1].substring(1, command[1].length - 1)
     }
 

@@ -6,6 +6,7 @@ import { renderVideo, bufferFile2, downloadFile } from "./download";
 import Xfmpe1Container, { parseXfmpe1String, Xfmpe1Command, Xfmpe1Preset } from "./xfmpe1command";
 const Discord = discordjs;
 const client = new Discord.Client();
+const discordbot = true; // CLI or not
 const botcommands: Command[] = []
 const list: Map<string, Xfmpe1Container> = new Map();
 const presets: Map<string, Xfmpe1Preset> = new Map();
@@ -106,12 +107,21 @@ commands.set("cut:before", new Xfmpe1Command("any", (seconds: number) => {
 Cuts everything BEFORE the timeframe specified.
 `))
 
-commands.set("copy", new Xfmpe1Command("any", () => {
-    return "-codec copy";
+commands.set("copy-v", new Xfmpe1Command("any", () => {
+    return "-c:v copy";
 }, `
 no args
 
-Skips encoding. 
+Skips video encoding. 
+It's not recommended to use this unless you know what your doing.
+`))
+
+commands.set("copy-a", new Xfmpe1Command("any", () => {
+    return "-c:a copy";
+}, `
+no args
+
+Skips audio encoding. 
 It's not recommended to use this unless you know what your doing.
 `))
 
@@ -122,6 +132,15 @@ commands.set("manual", new Xfmpe1Command("any", (manual: string) => {
 (ZELO ONLY)
 
 Manual lets you set ffmpeg commands that zfmpe1 currently doesn't have.
+`))
+
+commands.set("truemanual", new Xfmpe1Command("any", (truemanual: string) => {
+    return truemanual;
+}, `
+(truemanual)
+(ZELO ONLY)
+
+Do anything in ffmpeg.
 `))
 
 commands.set("s", new Xfmpe1Command("filter:v", (speed: number) => {
@@ -142,12 +161,12 @@ no args
 Inverts video colors.
 `))
 
-commands.set("mute", new Xfmpe1Command("any", () => {
+commands.set("mute-audio", new Xfmpe1Command("any", () => {
     return "-an";
 }, `
 no args
 
-Mutes video.
+Mutes audio. Use the mute preset unless you are also changing the video.
 `))
 
 presets.set("144p", new Xfmpe1Preset("scale!(144)", `
@@ -174,26 +193,25 @@ presets.set("lite", new Xfmpe1Preset("crf(35)", `
 Lowers the video's quality. Lite(tm)
 `))
 
-presets.set("optimize", new Xfmpe1Preset("480p lite preset(veryfast)", `
+presets.set("optimize", new Xfmpe1Preset("copy-a 480p lite preset(veryfast)", `
 Optimizes the video for discord.
 `))
 
-presets.set("s_optimize", new Xfmpe1Preset("360p lite preset(slow)", `
+presets.set("s_optimize", new Xfmpe1Preset("copy-a 360p yeet preset(slow)", `
 REALLY optimizes the video for discord.
 `))
 
-presets.set("a_optimize", new Xfmpe1Preset("optimize tune(animation)", `
-Optimizes animation for discord.
+presets.set("earrape", new Xfmpe1Preset("copy-v -af acrusher=.1:1:64:0:log", `
+Makes the aduio very loud.
 `))
 
-presets.set("sa_optimize", new Xfmpe1Preset("s_optimize tune(animation)", `
-REALLY optimizes animation for discord.
+presets.set("mute", new Xfmpe1Preset("copy-v mute-audio", `
+Makes the aduio very loud.
 `))
 
-presets.set("covertest", new Xfmpe1Preset("optimize manual(\"-map 0:0 -map 1:0\") copy", `
+presets.set("covertest", new Xfmpe1Preset("manual(\"-i res/L.png\") optimize manual(\"-map 0:0 -map 1:0\") copy", `
 Music cover video test
 `))
-
 
 const getCommandList = () => {
     let str = "";
@@ -244,16 +262,18 @@ ${getPresetList()}\`\`\`
         // the 4 is for the run command (lazy way)
         if (msg.attachments.first() !== undefined) {
             const attachment = msg.attachments.first() as discordjs.MessageAttachment
+            let parseExact = false;
 
             // console.log(attachment)
 
-            if (attachment.size > 4_194_304) {
-                msg.reply("video files can only be 4mb and below")
+            if (attachment.size > 8_388_608) {
+                msg.reply("video files can only be 8mb and below")
                 return;
             }
 
-            const parsedcmds = parseXfmpe1String(args, msg, commands, presets).trim()
+            if (args.substring(0, 10) === "truemanual") parseExact = true;
 
+            const parsedcmds = parseXfmpe1String(args, msg, commands, presets).trim()
             if (!parsedcmds.length) {
                 msg.reply("you need arguments! #debate")
                 return;
@@ -267,7 +287,7 @@ ${getPresetList()}\`\`\`
             msg.channel.startTyping();
 
             downloadFile(attachment.url).then(() => {
-                renderVideo(parsedcmds).then(() => {
+                renderVideo(parsedcmds, parseExact).then(() => {
                     const endTime = new Date(Date.now() - startTime).getTime();
                     msg.channel.send(`${msg.author}, here is your video, served fresh from the buffer (${endTime}ms):`, new MessageAttachment(bufferFile2, "video.mp4"))
                 }).catch((error) => {

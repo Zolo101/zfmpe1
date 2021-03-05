@@ -22,8 +22,12 @@ export async function downloadFile(url: string): Promise<void> {
     }
 }
 
-export async function renderVideo(cmds: string): Promise<void> {
-    await asyncCMD(`ffmpeg -hide_banner -loglevel warning -y -i ${bufferFile} ${cmds} ${bufferFile2}`)
+export async function renderVideo(cmds: string, exact = false): Promise<void> {
+    if (exact) {
+        await asyncCMD(`ffmpeg -hide_banner -loglevel warning -y ${cmds}`)
+    } else {
+        await asyncCMD(`ffmpeg -hide_banner -loglevel warning -y -i ${bufferFile} ${cmds} ${bufferFile2}`)
+    }
 }
 
 export default renderVideo;
