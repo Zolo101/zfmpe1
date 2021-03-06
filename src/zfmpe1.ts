@@ -3,7 +3,8 @@ import fs from "fs";
 import { MessageAttachment } from "discord.js";
 import Command, { prefix } from "./command";
 import { renderVideo, bufferFile2, downloadFile } from "./download";
-import Xfmpe1Container, { parseXfmpe1String, Xfmpe1Command, Xfmpe1Preset } from "./xfmpe1command";
+import parseXfmpe1String from "./core/parse";
+import { Xfmpe1Container, Xfmpe1Preset, Xfmpe1Command } from "./core/class";
 const Discord = discordjs;
 const client = new Discord.Client();
 const discordbot = true; // CLI or not
