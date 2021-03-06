@@ -5,7 +5,7 @@ import MessageCommmand from "../command";
 import { Container, Preset, Command } from "../core/class";
 import parseString from "../core/parse";
 import renderVideo, { downloadFile, bufferFile2 } from "../download";
-import { PREFIX, PRODUCTION } from "../globals";
+import { PREFIX, PRODUCTION, VERSION } from "../globals";
 
 const Discord = discordjs;
 const client = new Discord.Client();
@@ -233,7 +233,30 @@ const getPresetList = () => {
 
 botcommands.push(
     new MessageCommmand("ping", (msg) => msg.channel.send("pong")),
-    new MessageCommmand("help", (msg) => msg.channel.send(`\`\`\`
+    new MessageCommmand("help", (msg) => {
+        const args = msg.content.slice(PREFIX.length + 4).trim();
+        if (args) {
+            if (commands.has(args)) msg.channel.send(`\`\`\`${commands.get(args)?.description}\`\`\``)
+            if (presets.has(args)) msg.channel.send(`\`\`\`${presets.get(args)?.description}\`\`\``)
+        } else {
+            msg.channel.send(`\`\`\`scala
+main commands:
+    - run [filter]: Run a filter
+    - search [filter]: Search for filter
+    - create: Create a filter
+    - inv: List of filters you've created
+help commands:
+    - guide: For zfmpe1 newcomers (not done yet)
+    - help [filter]: Filter description
+    - all: All filters
+other commands:
+    - about: About the bot
+    - stats: Bot statistics
+    - ping: Pings the bot
+
+do "z help [filter]" to get help on a filter.\`\`\``)}
+    }),
+    new MessageCommmand("about", (msg) => msg.channel.send(`\`\`\`
 zfmpe1 is a small but incredibly powerful discord bot that gives you amazing tools to filter and change your videos to whatever you want. 
 zfmpe1 uses ffmpeg and makes it easy to use on discord. 
 to render a new video, do z run, following the presets/commands you want to use. 
@@ -242,23 +265,14 @@ have fun!
 if you want zfmpe1 on your server, contact Zelo101 with the member count and a discord invite 
 (i dont want zfmpe1's server to become too busy)
 
-made by zelo101, version 1.0\`\`\`
-    `)),
-    new MessageCommmand("tutor", (msg) => {
-        const args = msg.content.slice(PREFIX.length + 6).trim();
-        if (args) {
-            if (commands.has(args)) msg.channel.send(`\`\`\`${commands.get(args)?.description}\`\`\``)
-            if (presets.has(args)) msg.channel.send(`\`\`\`${presets.get(args)?.description}\`\`\``)
-        } else {
-            msg.reply(`\`\`\`
-do "tutor help command" for more infomation on a command.
+made by zelo101, version ${VERSION}\`\`\``)),
+    new MessageCommmand("all", (msg) => msg.reply(`\`\`\`
+do "z help [filter]" for more infomation on a filter.
 
-every command avaliable:
+all commands avaliable:
 ${getCommandList()}
-every preset avaliable:
-${getPresetList()}\`\`\`
-        `)}
-    }),
+all presets avaliable:
+${getPresetList()}\`\`\``)),
     new MessageCommmand("run", (msg) => {
         const args = msg.content.slice(PREFIX.length + 4).trim();
         // the 4 is for the run command (lazy way)
@@ -310,7 +324,7 @@ export default function readyBot(): void {
         console.log(`Logged in as ${client.user?.tag}`)
         client.user?.setPresence({
             activity: {
-                name: PRODUCTION ? "with ffmpeg | z tutor" : "when the code is sus!!"
+                name: PRODUCTION ? "with ffmpeg | z help" : "when the code is sus!!"
             }
         })
     });
