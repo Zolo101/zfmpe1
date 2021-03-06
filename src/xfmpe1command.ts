@@ -94,7 +94,7 @@ function parseXfmpe1Command(
 
     const params = command
         .slice(1) // get rid of the command
-        .map((param) => param.toLowerCase().match(/[a-z0-9]+/g)?.toString()) // make sure the params is lowercase
+        .map((param) => param.toLowerCase().match(/[a-z0-9.]+/g)?.toString()) // make sure the params is lowercase
 
     params.forEach((param) => {
         if (param === undefined) {
