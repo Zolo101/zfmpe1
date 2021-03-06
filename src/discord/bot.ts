@@ -316,10 +316,12 @@ export default function readyBot(): void {
     });
 
     client.on("message", (msg) => {
+        // No bots allowed
         if (msg.author.bot) return;
-        botcommands.forEach((command) => {
+
+        for (const command of botcommands) {
             if (command.equals(msg.content)) command.onRun(msg);
-        })
+        }
     });
 
     client.login(fs.readFileSync("token.txt").toString())

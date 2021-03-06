@@ -17,9 +17,9 @@ export default function parseString(
         c1 = preset.command.match(splitregex) as RegExpMatchArray
     }
     console.log(c1);
-    c1.forEach((cc) => { // Parse each command
+    for (const cc of c1) { // Parse each command
         if (cc !== null) str += parseCommand(cc, msg, cmdlib, prelib);
-    })
+    }
 
     console.log("Final string:", str)
     return str;
@@ -52,12 +52,12 @@ function parseCommand(
         .slice(1) // get rid of the command
         .map((param) => param.toLowerCase().match(/[a-z0-9.]+/g)?.toString()) // make sure the params is lowercase
 
-    params.forEach((param) => {
+    for (const param of params) {
         if (param === undefined) {
             msg.reply(`Illegal params: Characters allowed: a-z, 0-9. \`${command}\``)
             return "";
         }
-    })
+    }
 
     // Does function exist?
     if (!func) {
