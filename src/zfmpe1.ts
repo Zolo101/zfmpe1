@@ -143,14 +143,14 @@ commands.set("truemanual", new Xfmpe1Command("any", (truemanual: string) => {
 Do anything in ffmpeg.
 `))
 
-commands.set("s", new Xfmpe1Command("filter:v", (speed: number) => {
-    return `-filter:v "setpts=PTS/${speed}"`;
+commands.set("speed", new Xfmpe1Command("filter_complex", (speed: number) => {
+    return `-filter_complex "[0:v]setpts=${1 / speed}*PTS[v];[0:a]atempo=${speed}[a]" -map "[v]" -map "[a]"`;
 }, `
 (speed)
-(EXPERIMENTAL)
 
-Changes the video speed. (NOT THE AUDIO!)
-0.5 slows the video 200%, and 2 makes the video 2 times faster.
+Changes the video&audio speed. 
+0.1 would make the video 10 times slower.
+5 would make the video 5 times faster.
 `))
 
 commands.set("invert", new Xfmpe1Command("vf", () => {
