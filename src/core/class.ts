@@ -1,7 +1,7 @@
-export type inputTypes = Xfmpe1Preset | number | string | boolean
-export class Xfmpe1Container {
+export type inputTypes = Preset | number | string | boolean
+export class Container {
     prefix: string
-    commands: Xfmpe1Command[]
+    commands: Command[]
 
     constructor(prefix: string) {
         this.prefix = prefix;
@@ -9,7 +9,7 @@ export class Xfmpe1Container {
     }
 }
 
-export class Xfmpe1Command {
+export class Command {
     container: string
     make: (...params: inputTypes[]) => string
     attachments: number
@@ -33,7 +33,7 @@ export class Xfmpe1Command {
     }
 }
 
-export class Xfmpe1Preset {
+export class Preset {
     command: string
     description: string
 

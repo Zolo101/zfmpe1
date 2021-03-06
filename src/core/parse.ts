@@ -1,11 +1,11 @@
 import { Message } from "discord.js";
-import { Xfmpe1Command, Xfmpe1Preset } from "./class";
+import { Command, Preset } from "./class";
 
-export default function parseXfmpe1String(
+export default function parseString(
     cmds: string,
     msg: Message,
-    cmdlib: Map<string, Xfmpe1Command>,
-    prelib: Map<string, Xfmpe1Preset>,
+    cmdlib: Map<string, Command>,
+    prelib: Map<string, Preset>,
 ): string {
     // console.log(cmds, lib)
     const splitregex = /\S+\((.*?)\)|\S+/g
@@ -18,18 +18,18 @@ export default function parseXfmpe1String(
     }
     console.log(c1);
     c1.forEach((cc) => { // Parse each command
-        if (cc !== null) str += parseXfmpe1Command(cc, msg, cmdlib, prelib);
+        if (cc !== null) str += parseCommand(cc, msg, cmdlib, prelib);
     })
 
     console.log("Final string:", str)
     return str;
 }
 
-function parseXfmpe1Command(
+function parseCommand(
     cc: string,
     msg: Message,
-    cmdlib: Map<string, Xfmpe1Command>,
-    prelib: Map<string, Xfmpe1Preset>,
+    cmdlib: Map<string, Command>,
+    prelib: Map<string, Preset>,
 ): string {
     const command = cc.match(/[\w.!-]+|"(.*)"/g)
     // Does command exist?
@@ -40,7 +40,7 @@ function parseXfmpe1Command(
 
     // Preset check
     if (pre) {
-        return parseXfmpe1String(pre.command, msg, cmdlib, prelib)
+        return parseString(pre.command, msg, cmdlib, prelib)
     }
 
     // Manual check

@@ -1,7 +1,7 @@
 import { Message } from "discord.js"
 import { PREFIX } from "./globals";
 
-export class Command {
+export default class MessageCommmand {
     codeword: string
     run: (msg: Message) => void
 
@@ -18,5 +18,3 @@ export class Command {
         this.run(msg);
     }
 }
-
-export default Command;
