@@ -1,5 +1,5 @@
 import { Message } from "discord.js"
-export const prefix = "z ";
+import { PREFIX } from "./globals";
 
 export class Command {
     codeword: string
@@ -11,7 +11,7 @@ export class Command {
     }
 
     equals(message: string): boolean {
-        return (message.includes(prefix + this.codeword))
+        return (message.includes(PREFIX + this.codeword))
     }
 
     onRun(msg: Message): void {

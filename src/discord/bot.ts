@@ -1,13 +1,14 @@
 import * as discordjs from "discord.js";
 import fs from "fs";
 import { MessageAttachment } from "discord.js";
-import Command, { prefix } from "./command";
-import { renderVideo, bufferFile2, downloadFile } from "./download";
-import parseXfmpe1String from "./core/parse";
-import { Xfmpe1Container, Xfmpe1Preset, Xfmpe1Command } from "./core/class";
+import Command from "../command";
+import { Xfmpe1Container, Xfmpe1Preset, Xfmpe1Command } from "../core/class";
+import parseXfmpe1String from "../core/parse";
+import renderVideo, { downloadFile, bufferFile2 } from "../download";
+import { PREFIX, PRODUCTION } from "../globals";
+
 const Discord = discordjs;
 const client = new Discord.Client();
-const discordbot = true; // CLI or not
 const botcommands: Command[] = []
 const list: Map<string, Xfmpe1Container> = new Map();
 const presets: Map<string, Xfmpe1Preset> = new Map();
@@ -244,7 +245,7 @@ if you want zfmpe1 on your server, contact Zelo101 with the member count and a d
 made by zelo101, version 1.0\`\`\`
     `)),
     new Command("tutor", (msg) => {
-        const args = msg.content.slice(prefix.length + 6).trim();
+        const args = msg.content.slice(PREFIX.length + 6).trim();
         if (args) {
             if (commands.has(args)) msg.channel.send(`\`\`\`${commands.get(args)?.description}\`\`\``)
             if (presets.has(args)) msg.channel.send(`\`\`\`${presets.get(args)?.description}\`\`\``)
@@ -259,7 +260,7 @@ ${getPresetList()}\`\`\`
         `)}
     }),
     new Command("run", (msg) => {
-        const args = msg.content.slice(prefix.length + 4).trim();
+        const args = msg.content.slice(PREFIX.length + 4).trim();
         // the 4 is for the run command (lazy way)
         if (msg.attachments.first() !== undefined) {
             const attachment = msg.attachments.first() as discordjs.MessageAttachment
@@ -304,20 +305,22 @@ ${getPresetList()}\`\`\`
     }),
 )
 
-client.on("ready", () => {
-    console.log(`Logged in as ${client.user?.tag}`)
-    client.user?.setPresence({
-        activity: {
-            name: "with ffmpeg | z tutor"
-        }
-    })
-});
+export default function readyBot(): void {
+    client.on("ready", () => {
+        console.log(`Logged in as ${client.user?.tag}`)
+        client.user?.setPresence({
+            activity: {
+                name: PRODUCTION ? "with ffmpeg | z tutor" : "when the code is sus!!"
+            }
+        })
+    });
 
-client.on("message", (msg) => {
-    if (msg.author.bot) return;
-    botcommands.forEach((command) => {
-        if (command.equals(msg.content)) command.onRun(msg);
-    })
-});
+    client.on("message", (msg) => {
+        if (msg.author.bot) return;
+        botcommands.forEach((command) => {
+            if (command.equals(msg.content)) command.onRun(msg);
+        })
+    });
 
-client.login(fs.readFileSync("token.txt").toString())
+    client.login(fs.readFileSync("token.txt").toString())
+}
