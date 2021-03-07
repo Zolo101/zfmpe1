@@ -1,11 +1,12 @@
 import { Message } from "discord.js"
 import { PREFIX } from "./globals";
 
+export type MessageCommmandFunction = (msg: Message, arg?: string) => void;
 export default class MessageCommmand {
     codeword: string
-    run: (msg: Message, arg: string) => void
+    run: MessageCommmandFunction
 
-    constructor(codeword: string, code: (msg: Message, arg?: string) => void) {
+    constructor(codeword: string, code: MessageCommmandFunction) {
         this.codeword = codeword;
         this.run = code;
     }
