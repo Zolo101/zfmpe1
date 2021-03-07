@@ -36,6 +36,8 @@ botcommands.push(
 export default function readyBot(): void {
     client.on("ready", () => {
         console.log(`Logged in as ${client.user?.tag}`)
+        console.log(process.env.NODE_ENV);
+        console.log(`>> ${PRODUCTION} MODE <<`)
         client.user?.setPresence({
             activity: {
                 name: PRODUCTION ? "with ffmpeg | z help" : "when the code is sus!!"
