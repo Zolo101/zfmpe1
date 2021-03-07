@@ -1,6 +1,6 @@
 import { Command } from "./class";
 
-const commands: Map < string, Command > = new Map();
+const commands: Map <string, Command> = new Map();
 export default commands;
 commands.set("scale", new Command("vf", (width: number, height: number, algorithm = "fast_bilinear") => {
     return `-vf scale=${width}:${height}:flags=${algorithm}`;

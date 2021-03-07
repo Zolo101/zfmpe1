@@ -8,6 +8,7 @@ import renderVideo, { downloadFile, bufferFile2 } from "../download";
 import { PREFIX, PRODUCTION, VERSION } from "../globals";
 import commands from "../core/filters";
 import presets from "../core/presets";
+import { searchArray } from "../core/util";
 
 const Discord = discordjs;
 const client = new Discord.Client();
@@ -80,7 +81,24 @@ botcommands.push(
             msg.reply("please include a media file with your command");
         }
     }),
-    new MessageCommmand("search", (msg) => msg.channel.send("Unfinished Command")),
+    new MessageCommmand("search", (msg, arg) => {
+        if (arg === undefined || arg === "") {
+            msg.channel.send("You need to search for something!");
+            return;
+        }
+        const results = searchArray(arg, commands.keys());
+        if (results === null) {
+            msg.channel.send("Found nothing :(");
+            return;
+        }
+
+        if (results[0] === arg) {
+            msg.channel.send(`\`\`\`${commands.get(arg)?.description as string}\`\`\``);
+            return;
+        }
+
+        msg.channel.send(`Similar filters: \n\`\`\`${results.join("\n")}\`\`\``);
+    }),
     new MessageCommmand("create", (msg) => msg.channel.send("Unfinished Command")),
     new MessageCommmand("inv", (msg) => msg.channel.send("Unfinished Command")),
     new MessageCommmand("guide", (msg) => msg.channel.send("Unfinished Command")),
@@ -93,7 +111,7 @@ botcommands.push(
             msg.channel.send(`\`\`\`scala
 main commands:
     - run [filter]: Run a filter
-    - search [filter]: Search for filter
+    - search [keywords]: Search for related filters
     - create: Create a filter
     - inv: List of filters you've created
 help commands:
@@ -143,7 +161,8 @@ export default function readyBot(): void {
         if (msg.author.bot) return;
 
         for (const command of botcommands) {
-            if (command.equals(msg.content)) command.onRun(msg);
+            const args = msg.content.slice(PREFIX.length + command.codeword.length).trim();
+            if (command.equals(msg.content)) command.run(msg, args);
         }
     });
 
