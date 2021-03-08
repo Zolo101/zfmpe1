@@ -16,8 +16,6 @@ const executeRun: MessageCommmandFunction = (msg, args) => {
         const attachment = msg.attachments.first() as MessageAttachment
         let parseExact = false;
 
-        // console.log(attachment)
-
         if (attachment.size > 8_388_608) {
             msg.reply("video files can only be 8mb and below")
             return;

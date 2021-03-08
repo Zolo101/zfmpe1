@@ -2,6 +2,7 @@ import cmd from "node-cmd";
 import Downloader from "nodejs-file-downloader";
 import path from "path";
 import BPromise from "bluebird";
+import chalk from "chalk";
 const asyncCMD = BPromise.promisify(cmd.get, { multiArgs: true, context: cmd }) as any;
 export const bufferFolder = path.resolve(__dirname, "../videos")
 export const bufferFile = path.resolve(__dirname, "../videos", "buffer.mp4")
@@ -16,9 +17,8 @@ export async function downloadFile(url: string): Promise<void> {
     })
     try {
         await downloader.download();
-        // console.log("Downloaded")
     } catch (error) {
-        console.log("Download Failed:", error)
+        console.error(chalk.redBright("Download Failed:", error))
     }
 }
 

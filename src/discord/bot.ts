@@ -12,6 +12,7 @@ import executeGuide from "../core/commands/guide";
 import executeHelp from "../core/commands/help";
 import executeAllList from "../core/commands/all";
 import executePing from "../core/commands/ping";
+import chalk from "chalk";
 
 const botcommands: MessageCommmand[] = []
 const list: Map<string, Container> = new Map();
@@ -35,9 +36,8 @@ botcommands.push(
 
 export default function readyBot(): void {
     client.on("ready", () => {
-        console.log(`Logged in as ${client.user?.tag}`)
-        console.log(process.env.NODE_ENV);
-        console.log(`>> ${PRODUCTION} MODE <<`)
+        console.log(chalk.bgGreenBright(`Logged in as ${client.user?.tag}`))
+        console.log(chalk.bgGreen(`>> ${PRODUCTION} MODE <<`))
         client.user?.setPresence({
             activity: {
                 name: PRODUCTION ? "with ffmpeg | z help" : "when the code is sus!!"
