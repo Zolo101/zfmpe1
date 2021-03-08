@@ -1,7 +1,7 @@
 import fs from "fs";
 import MessageCommmand from "../command";
 import { Container } from "../core/class";
-import { client, PREFIX, PRODUCTION } from "../globals";
+import { client, MODE, PREFIX, PRODUCTION } from "../globals";
 import executeRun from "../core/commands/run";
 import executeStats from "../core/commands/stats";
 import executeAbout from "../core/commands/about";
@@ -36,8 +36,8 @@ botcommands.push(
 
 export default function readyBot(): void {
     client.on("ready", () => {
-        console.log(chalk.bgGreenBright(`Logged in as ${client.user?.tag}`))
-        console.log(chalk.bgGreen(`>> ${PRODUCTION} MODE <<`))
+        console.log(chalk.greenBright(`Logged in as ${client.user?.tag}`))
+        console.log(chalk.yellow(`>> ${MODE} MODE <<`))
         client.user?.setPresence({
             activity: {
                 name: PRODUCTION ? "with ffmpeg | z help" : "when the code is sus!!"
