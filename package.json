@@ -6,7 +6,7 @@
   "main": "index.js",
   "scripts": {
     "build": "tsc",
-    "watch": "tsc -w",
+    "watch": "tsc-watch --onSuccess \"npm run start-dev\"",
     "start-dev": "tsc && node ./dist/index.js",
     "start-prod": "tsc && node ./dist/index.js process.env.NODE_ENV=\"PRODUCTION\""
   },
@@ -25,6 +25,7 @@
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "eslint": "^7.17.0",
+    "tsc-watch": "^4.2.9",
     "typescript": "^4.1.3"
   }
 }
