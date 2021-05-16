@@ -1,13 +1,11 @@
 import { MessageCommmandFunction } from "../../command";
-import { PREFIX } from "../../globals";
 import commands from "../filters";
 import presets from "../presets";
 
-const executeHelp: MessageCommmandFunction = (msg) => {
-    const args = msg.content.slice(PREFIX.length + 4).trim();
-    if (args) {
-        if (commands.has(args)) msg.channel.send(`\`\`\`${commands.get(args)?.description}\`\`\``)
-        if (presets.has(args)) msg.channel.send(`\`\`\`${presets.get(args)?.description}\`\`\``)
+const executeHelp: MessageCommmandFunction = (msg, arg) => {
+    if (arg) {
+        if (commands.has(arg)) msg.channel.send(`\`\`\`${commands.get(arg)?.description}\`\`\``)
+        if (presets.has(arg)) msg.channel.send(`\`\`\`${presets.get(arg)?.description}\`\`\``)
     } else {
         msg.channel.send(`\`\`\`scala
 main commands:

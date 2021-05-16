@@ -17,6 +17,7 @@
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "discord.js": "^12.5.1",
+    "no-mysql": "^1.0.3",
     "node-cmd": "^4.0.0",
     "nodejs-file-downloader": "^4.1.1"
   },
