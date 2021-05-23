@@ -8,22 +8,27 @@
     "build": "tsc",
     "watch": "tsc-watch --onSuccess \"npm run start-dev\"",
     "start-dev": "tsc && node ./dist/index.js",
-    "start-prod": "tsc && node ./dist/index.js process.env.NODE_ENV=\"PRODUCTION\""
+    "start-prod": "tsc && node ./dist/index.js NODE_ENV=\"PRODUCTION\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "aws-sdk": "^2.912.0",
+    "axios": "^0.21.1",
     "bluebird": "^3.7.2",
     "chalk": "^4.1.0",
     "discord.js": "^12.5.1",
+    "form-data": "^3.0.1",
     "no-mysql": "^1.0.3",
     "node-cmd": "^4.0.0",
+    "node-fetch": "^2.6.1",
     "nodejs-file-downloader": "^4.1.1"
   },
   "devDependencies": {
     "@types/bluebird": "^3.5.33",
     "@types/node": "^14.14.21",
+    "@types/node-fetch": "^2.5.10",
     "@typescript-eslint/eslint-plugin": "^4.13.0",
     "@typescript-eslint/parser": "^4.13.0",
     "eslint": "^7.17.0",

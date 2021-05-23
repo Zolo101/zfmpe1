@@ -5,14 +5,14 @@ import { DbTableValue } from "no-mysql/dist/database";
 import { CACHEINTERVAL } from "../globals";
 import { DB_QUEUE, pushQueue } from "./cache";
 import { fetchRealDatabase } from "./real";
-const cred = fs.readFileSync("dbcred.txt").toString("utf8").split("\n")
+const cred = fs.readFileSync("dbcred.txt").toString("utf8").split("\n").map((str) => str.trim())
 export const db = new Database(
     {
-        host: cred[0].trim(),
-        port: Number(cred[1].trim()),
-        user: cred[2].trim(),
-        password: cred[3].trim(),
-        database: cred[4].trim()
+        host: cred[0],
+        port: Number(cred[1]),
+        user: cred[2],
+        password: cred[3],
+        database: cred[4]
     },
     {
         zfmpe1: {
@@ -34,7 +34,7 @@ export const DATABASE = {
     version: 1,
     items: new Map<string, zfmpe1Entry>(),
 };
-fetchRealDatabase(db).then((res) => console.log(res));
+fetchRealDatabase(db);//.then((res) => console.log(res));
 
 export async function updateCache(): Promise<void> {
     try {
