@@ -4,7 +4,6 @@ import fs from "fs";
 import fetch from "node-fetch";
 import axios from "axios";
 import aws from "aws-sdk";
-// import renderVideo, { downloadFile, bufferFile2 } from "../../download";
 import commands from "../filters";
 import parseString from "../parse";
 import presets from "../presets";
@@ -127,17 +126,6 @@ Warning: Linked media will be deleted within 2 days.`)
         }
 
         msg.channel.stopTyping();
-
-        // downloadFile(attachment.url).then(() => {
-        //     renderVideo(parsedcmds, parseExact).then(() => {
-        //         const endTime = new Date(Date.now() - startTime).getTime();
-        //         msg.channel.send(`${msg.author}, here is your video, served fresh from the buffer (${endTime}ms):`, new MessageAttachment(bufferFile2, "video.mp4"))
-        //         renders += 1;
-        //     }).catch((error) => {
-        //         msg.channel.send("sorry, there has been an error at our side")
-        //         console.error("FFMPEG ERROR:", error)
-        //     })
-        // }).catch(() => msg.channel.send("sorry, im unable to download your media file"))
     } else {
         msg.reply("please include a media file with your command");
     }

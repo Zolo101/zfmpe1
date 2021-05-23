@@ -24,17 +24,17 @@ list.set("vf", new Container("vf"));
 list.set("filter:v", new Container("filter:v"));
 
 botcommands.push(
-    new MessageCommmand("run", (msg, arg) => executeRun(msg, arg)),
-    new MessageCommmand("search", (msg, arg) => executeSearch(msg, arg)),
-    new MessageCommmand("create", (msg, arg) => executeCreate(msg, arg)),
-    new MessageCommmand("inv", (msg) => executeInv(msg)),
-    new MessageCommmand("guide", (msg) => executeGuide(msg)),
-    new MessageCommmand("help", (msg, arg) => executeHelp(msg, arg)),
-    new MessageCommmand("all", (msg) => executeAllList(msg)),
-    new MessageCommmand("about", (msg) => executeAbout(msg)),
-    new MessageCommmand("stats", (msg) => executeStats(msg)),
-    new MessageCommmand("ping", (msg) => executePing(msg)),
-    new MessageCommmand("sudo", (msg, arg) => executeSudo(msg, arg)),
+    new MessageCommmand("run", async (msg, arg) => executeRun(msg, arg)),
+    new MessageCommmand("search", async (msg, arg) => executeSearch(msg, arg)),
+    new MessageCommmand("create", async (msg, arg) => executeCreate(msg, arg)),
+    new MessageCommmand("inv", async (msg) => executeInv(msg)),
+    new MessageCommmand("guide", async (msg) => executeGuide(msg)),
+    new MessageCommmand("help", async (msg, arg) => executeHelp(msg, arg)),
+    new MessageCommmand("all", async (msg) => executeAllList(msg)),
+    new MessageCommmand("about", async (msg) => executeAbout(msg)),
+    new MessageCommmand("stats", async (msg) => executeStats(msg)),
+    new MessageCommmand("ping", async (msg) => executePing(msg)),
+    new MessageCommmand("sudo", async (msg, arg) => executeSudo(msg, arg)),
 )
 
 export default function readyBot(): void {
