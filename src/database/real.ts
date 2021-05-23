@@ -10,7 +10,7 @@ export async function fetchRealDatabase(db: Database<{zfmpe1: REAL_DB_STRUCT}>) 
 
 // It's recommended to insert multiple items at once to lower calls.
 export async function insertRealItem(db: Database<{zfmpe1: REAL_DB_STRUCT}>, item: zfmpe1Entry) {
-    return await db.zfmpe1.insert(item)
+    return await db.zfmpe1.insert(item as unknown as any)
 }
 
 export async function insertRealItems(db: Database<{zfmpe1: REAL_DB_STRUCT}>, items: zfmpe1Entry[]) {
