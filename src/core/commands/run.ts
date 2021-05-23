@@ -3,13 +3,13 @@ import { MessageCommmandFunction } from "../../command";
 import fs from "fs";
 import fetch from "node-fetch";
 import axios from "axios";
-import aws from "aws-sdk";
+import S3 from "aws-sdk/clients/s3";
 import commands from "../filters";
 import parseString from "../parse";
 import presets from "../presets";
 export let renders = 0;
 const cred = fs.readFileSync("awscred.txt").toString("utf8").split("\n").map((str) => str.trim())
-const S3 = new aws.S3({
+const S3OutputBucket = new S3({
     credentials: {
         accessKeyId: cred[0],
         secretAccessKey: cred[1]
@@ -22,7 +22,7 @@ const uploadToS3 = async (video: Buffer, extension: string, args: string[]) => {
     // const packedData = new Blob({video: u8Video.buffer, extension, args}, {type: "applications/json"})
     const name = `${Date.now()}_${renders}.zfmpe1`
 
-    await S3.upload({
+    await S3OutputBucket.upload({
         Bucket: "zfmpe1-input",
         Key: name,
         Body: JSON.stringify({ video: video.toString("base64"), extension, args })
