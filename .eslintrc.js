@@ -39,5 +39,6 @@ module.exports = {
         "lines-between-class-members": 0,
         "no-param-reassign": ["error", { props: false }],
         "@typescript-eslint/explicit-module-boundary-types": 0,
+        "@typescript-eslint/ban-ts-comment": 1,
     },
 };

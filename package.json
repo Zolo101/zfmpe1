@@ -20,6 +20,7 @@
     "aws-sdk": "^2.912.0",
     "axios": "^0.21.1",
     "chalk": "^4.1.0",
+    "discord-buttons": "^2.4.1",
     "discord.js": "https://github.com/discordjs/discord.js/archive/b90b0c3cfa2278caa38d1ff41eef2ccf4428b99e.tar.gz",
     "form-data": "^3.0.1",
     "no-mysql": "^1.0.3",
